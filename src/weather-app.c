@@ -1,5 +1,7 @@
+
 #include <pebble.h>
 #include "common.h"
+
 
 static Window *window;
 TextLayer *text_date_layer;
@@ -26,6 +28,7 @@ GFont *font21B;
 GFont *font19;
 GFont *font16;
 GFont *font10;
+GFont *font12;
 
 static GBitmap *image = NULL;
 static GBitmap *image_BMW = NULL;
@@ -165,7 +168,7 @@ void set_status(int new_status_display) {
 static void p_battery_layer_update_callback(Layer *layer, GContext *ctx) {
 
   graphics_context_set_compositing_mode(ctx, GCompOpAssign);
-   snprintf(battery_level_string, 5, "%d%%", battery_level);
+   snprintf(battery_level_string, 5, "%d", battery_level);
   text_layer_set_text(battery_level_layer, battery_level_string);
   //text_layer_set_text(text_unit_layer, unit_layer);
   
@@ -173,7 +176,7 @@ static void p_battery_layer_update_callback(Layer *layer, GContext *ctx) {
   if (!battery_plugged) {
     graphics_draw_bitmap_in_rect(ctx, icon_battery_normal, GRect(0, 0, 35, 15));
     graphics_context_set_stroke_color(ctx, GColorBlack);
-    graphics_context_set_fill_color(ctx, GColorWhite);
+    graphics_context_set_fill_color(ctx, GColorBlack);
     graphics_fill_rect(ctx, GRect(16, 5, (uint8_t)((battery_level / 100.0) * 11.0), 4), 0, GCornerNone);
     } else {
     graphics_draw_bitmap_in_rect(ctx, icon_battery_charge, GRect(0, 0, 35, 15));
@@ -223,8 +226,8 @@ static void window_load(Window *window) {
   font21 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ROBOTO_CONDENSED_21));
   font19 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ROBOTO_CONDENSED_19));
   font16 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ROBOTO_CONDENSED_16));
-  font10 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ROBOTO_CONDENSED_11));
-
+  font12 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ROBOTO_CONDENSED_12));
+  font10 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ROBOTO_CONDENSED_10));
   
   icon_battery_normal = gbitmap_create_with_resource(RESOURCE_ID_WATCH_BATTERY_NORMAL);
   icon_battery_charge = gbitmap_create_with_resource(RESOURCE_ID_WATCH_BATTERY_CHARGE);
@@ -254,11 +257,11 @@ static void window_load(Window *window) {
     
   
   // create battery level layer - this is where time goes
-  battery_level_layer = text_layer_create(GRect(144-44, 15, 40, 40));
+  battery_level_layer = text_layer_create(GRect(138-15, 15, 15, 15));
   text_layer_set_text_alignment(battery_level_layer, GTextAlignmentRight);
   text_layer_set_text_color(battery_level_layer, GColorWhite);
   text_layer_set_background_color(battery_level_layer, GColorClear);
-  text_layer_set_font(battery_level_layer, font10);
+  text_layer_set_font(battery_level_layer, font12);
   layer_add_child(window_layer, text_layer_get_layer(battery_level_layer));
 
   
@@ -279,14 +282,14 @@ static void window_load(Window *window) {
   layer_add_child(window_layer, text_layer_get_layer(text_minute_layer));
   
   // create wkday layer - this is where time goes
-  text_wkday_layer = text_layer_create(GRect(74, 80, 50, 30));
+  text_wkday_layer = text_layer_create(GRect(73, 80, 50, 30));
   text_layer_set_text_color(text_wkday_layer, GColorBlack);
   text_layer_set_background_color(text_wkday_layer, GColorClear);
   text_layer_set_font(text_wkday_layer, font21);
   layer_add_child(window_layer, text_layer_get_layer(text_wkday_layer));
   
   // create day layer - this is where time goes
-  text_day_layer = text_layer_create(GRect(42, 102, 28, 28));
+  text_day_layer = text_layer_create(GRect(41, 101, 28, 28));
   text_layer_set_text_alignment(text_day_layer, GTextAlignmentRight);
   text_layer_set_text_color(text_day_layer, GColorWhite);
   text_layer_set_background_color(text_day_layer, GColorClear);
@@ -311,11 +314,11 @@ static void window_load(Window *window) {
   layer_add_child(window_layer, text_layer_get_layer(text_temp_layer));
   
   // create temperature label layer - this is where the temperature goes
-  text_unit_layer = text_layer_create(GRect(62, 130, 20, 20));
-  text_layer_set_text_alignment(text_unit_layer, GTextAlignmentCenter);
-  text_layer_set_text_color(text_unit_layer, GColorBlack);
-  text_layer_set_background_color(text_temp_layer, GColorClear);
-  text_layer_set_font(text_unit_layer, font16);
+  text_unit_layer = text_layer_create(GRect(140-15, 130, 15, 15));
+  text_layer_set_text_alignment(text_unit_layer, GTextAlignmentRight);
+  text_layer_set_text_color(text_unit_layer, GColorWhite);
+  text_layer_set_background_color(text_unit_layer, GColorClear);
+  text_layer_set_font(text_unit_layer, font12);
   layer_add_child(window_layer, text_layer_get_layer(text_unit_layer));
   //force_update();
   
@@ -356,6 +359,7 @@ static void window_unload(Window *window) {
   fonts_unload_custom_font(font21B);
   fonts_unload_custom_font(font19);
   fonts_unload_custom_font(font10);
+  fonts_unload_custom_font(font12);
   fonts_unload_custom_font(font16);
 }
 
@@ -397,6 +401,9 @@ void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
   strftime(day_text, sizeof(day_text), "%e", tick_time);
   text_layer_set_text(text_day_layer, day_text);
 
+  //text_layer_set_text(text_day_layer, "30");
+ 
+  
   strftime(wkday_text, sizeof(wkday_text), "%a", tick_time);
   text_layer_set_text(text_wkday_layer, wkday_text);
 }   
