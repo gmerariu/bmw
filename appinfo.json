@@ -60,12 +60,7 @@
             {
                 "file": "fonts/Roboto-Condensed.ttf",
                 "type": "font",
-                "name": "FONT_ROBOTO_CONDENSED_10"
-            },
-            {
-                "file": "fonts/Roboto-Condensed.ttf",
-                "type": "font",
-                "name": "FONT_ROBOTO_CONDENSED_16"
+                "name": "FONT_ROBOTO_CONDENSED_21"
             },
             {
                 "file": "fonts/Roboto-Condensed.ttf",
@@ -75,7 +70,12 @@
             {
                 "file": "fonts/Roboto-Condensed.ttf",
                 "type": "font",
-                "name": "FONT_ROBOTO_CONDENSED_21"
+                "name": "FONT_ROBOTO_CONDENSED_16"
+            },
+            {
+                "file": "fonts/Roboto-Condensed.ttf",
+                "type": "font",
+                "name": "FONT_ROBOTO_CONDENSED_11"
             },
             {
                 "file": "images/wind.png",

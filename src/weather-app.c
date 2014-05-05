@@ -4,7 +4,10 @@
 static Window *window;
 TextLayer *text_date_layer;
 TextLayer *text_time_layer;
-TextLayer *text_temp_layer;
+TextLayer *text_temp_layer; 
+
+TextLayer *text_unit_layer;
+static char *unit_layer="C";
 
 TextLayer *text_day_layer;
 TextLayer *text_minute_layer;
@@ -133,6 +136,7 @@ static void p_battery_layer_update_callback(Layer *layer, GContext *ctx) {
   graphics_context_set_compositing_mode(ctx, GCompOpAssign);
    snprintf(battery_level_string, 5, "%d%%", battery_level);
   text_layer_set_text(battery_level_layer, battery_level_string);
+  text_layer_set_text(text_unit_layer, unit_layer);
   
   
   if (!battery_plugged) {
@@ -180,13 +184,15 @@ static void battery_state_handler(BatteryChargeState charge) {
 static void window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
 
+  
+  
   font49 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ROBOTO_BOLD_SUBSET_49));
   font39 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ROBOTO_BOLD_SUBSET_39));
   font21B = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ROBOTO_BOLD_SUBSET_24));
   font21 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ROBOTO_CONDENSED_21));
   font19 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ROBOTO_CONDENSED_19));
   font16 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ROBOTO_CONDENSED_16));
-  font10 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ROBOTO_CONDENSED_10));
+  font10 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ROBOTO_CONDENSED_11));
 
   
   icon_battery_normal = gbitmap_create_with_resource(RESOURCE_ID_WATCH_BATTERY_NORMAL);
@@ -210,14 +216,15 @@ static void window_load(Window *window) {
   
  //Create bluetooth pic 
   image_BT = gbitmap_create_with_resource(RESOURCE_ID_BLUETOOTH_ON);
-  image_layer_BT = bitmap_layer_create(GRect(0, 0, 30, 30));
+  image_layer_BT = bitmap_layer_create(GRect(0, 0, 25, 25));
   bitmap_layer_set_bitmap(image_layer_BT, image_BT);
   layer_add_child(window_layer, bitmap_layer_get_layer(image_layer_BT));
      
     
   
   // create battery level layer - this is where time goes
-  battery_level_layer = text_layer_create(GRect(144-28, 15, 40, 40));
+  battery_level_layer = text_layer_create(GRect(144-44, 15, 40, 40));
+  text_layer_set_text_alignment(battery_level_layer, GTextAlignmentRight);
   text_layer_set_text_color(battery_level_layer, GColorWhite);
   text_layer_set_background_color(battery_level_layer, GColorClear);
   text_layer_set_font(battery_level_layer, font10);
@@ -248,7 +255,8 @@ static void window_load(Window *window) {
   layer_add_child(window_layer, text_layer_get_layer(text_wkday_layer));
   
   // create day layer - this is where time goes
-  text_day_layer = text_layer_create(GRect(50, 102, 28, 28));
+  text_day_layer = text_layer_create(GRect(42, 102, 28, 28));
+  text_layer_set_text_alignment(text_day_layer, GTextAlignmentRight);
   text_layer_set_text_color(text_day_layer, GColorWhite);
   text_layer_set_background_color(text_day_layer, GColorClear);
   text_layer_set_font(text_day_layer, font19);
@@ -264,12 +272,20 @@ static void window_load(Window *window) {
   layer_add_child(window_layer, text_layer_get_layer(text_date_layer));
 
   // create temperature layer - this is where the temperature goes
-  text_temp_layer = text_layer_create(GRect(144-32, 168-26, 40, 40));
+  text_temp_layer = text_layer_create(GRect(144-44, 168-26, 40, 40));
+  text_layer_set_text_alignment(text_temp_layer, GTextAlignmentRight);
   text_layer_set_text_color(text_temp_layer, GColorWhite);
   text_layer_set_background_color(text_temp_layer, GColorClear);
   text_layer_set_font(text_temp_layer, font21);
   layer_add_child(window_layer, text_layer_get_layer(text_temp_layer));
   
+  // create temperature label layer - this is where the temperature goes
+  text_unit_layer = text_layer_create(GRect(62, 130, 20, 20));
+  text_layer_set_text_alignment(text_unit_layer, GTextAlignmentCenter);
+  text_layer_set_text_color(text_unit_layer, GColorBlack);
+  text_layer_set_background_color(text_temp_layer, GColorClear);
+  text_layer_set_font(text_unit_layer, font16);
+  layer_add_child(window_layer, text_layer_get_layer(text_unit_layer));
   //force_update();
   
 }
@@ -283,6 +299,7 @@ static void window_unload(Window *window) {
   text_layer_destroy(text_day_layer);
   text_layer_destroy(text_wkday_layer);
   text_layer_destroy(battery_level_layer);
+  text_layer_destroy(text_unit_layer);
   
   layer_destroy(p_battery_layer);
   gbitmap_destroy(icon_battery_normal);
