@@ -8,11 +8,16 @@ TextLayer *text_temp_layer;
 
 TextLayer *text_unit_layer;
 static char *unit_layer="C";
+static bool c_or_f;
+static char *str_temp;
+static char *str_temp_F;
 
 TextLayer *text_day_layer;
 TextLayer *text_minute_layer;
 TextLayer *text_wkday_layer;
 TextLayer *battery_level_layer;
+
+
 
 GFont *font49;
 GFont *font39;
@@ -44,7 +49,7 @@ static uint8_t battery_level;
 static bool battery_plugged;
 static char battery_level_string[5];
 
-static bool Bluetooth_on_off;
+//static bool Bluetooth_on_off;
 
 #define NUMBER_OF_IMAGES 11
 const int IMAGE_RESOURCE_IDS[NUMBER_OF_IMAGES] = {
@@ -70,20 +75,46 @@ enum {
   LOCATION
 };
 
-
+static void disp_update(void){
+    if (c_or_f == false){
+      c_or_f = true;
+      unit_layer="C";
+      text_layer_set_text(text_unit_layer, unit_layer);
+      text_layer_set_text(text_temp_layer, str_temp);
+    } else {
+      c_or_f = false;
+      unit_layer="F";
+       text_layer_set_text(text_unit_layer, unit_layer);
+       text_layer_set_text(text_temp_layer, str_temp_F);
+          }
+  
+  app_message_open(64, 16);
+  
+  
+}
 
 void in_received_handler(DictionaryIterator *received, void *context) {
   // incoming message received
+  
+  
+  // Celsius or Fahrenheit?
+  
   Tuple *temperature = dict_find(received, WEATHER_TEMPERATURE_C);
+
+  Tuple *temperatureF = dict_find(received, WEATHER_TEMPERATURE_F);
+    
   Tuple *icon = dict_find(received, WEATHER_ICON);
   
-  char *str_temp = temperature->value->cstring;
-  strcpy (str_temp, str_temp);
-  //strcat (str_temp,  " C");
+  str_temp = temperature->value->cstring;
+   
+  str_temp_F = temperatureF->value->cstring;
   
-  if (temperature) {
-    text_layer_set_text(text_temp_layer, str_temp);
-  }
+  disp_update();
+ 
+  //if (temperature) {
+    
+    
+  //}
 
   if (icon) {
     // figure out which resource to use
@@ -136,7 +167,7 @@ static void p_battery_layer_update_callback(Layer *layer, GContext *ctx) {
   graphics_context_set_compositing_mode(ctx, GCompOpAssign);
    snprintf(battery_level_string, 5, "%d%%", battery_level);
   text_layer_set_text(battery_level_layer, battery_level_string);
-  text_layer_set_text(text_unit_layer, unit_layer);
+  //text_layer_set_text(text_unit_layer, unit_layer);
   
   
   if (!battery_plugged) {
@@ -334,6 +365,14 @@ static void app_message_init(void) {
   app_message_register_inbox_received(in_received_handler);
 }
 
+
+
+void handle_tap(AccelAxisType axis, int32_t direction) {
+    
+  //vibes_short_pulse();
+  disp_update();
+}
+
 // show the date and time every minute
 void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
   // Need to be static because they're used by the system later.
@@ -387,7 +426,8 @@ static void init(void) {
   //tick_timer_service_subscribe(HOUR_UNIT, handle_hour_tick);  
   
   battery_state_service_subscribe(battery_state_handler);
-  bluetooth_connection_service_subscribe(Bluetooth_Connection_Handler);	
+  bluetooth_connection_service_subscribe(Bluetooth_Connection_Handler);
+  accel_tap_service_subscribe(handle_tap);
 
 }
 
@@ -400,6 +440,7 @@ static void deinit(void) {
   window_destroy(window);
    battery_state_service_unsubscribe();
    bluetooth_connection_service_unsubscribe();
+  accel_tap_service_unsubscribe();
 
   
 }
