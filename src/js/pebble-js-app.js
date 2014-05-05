@@ -22,7 +22,7 @@ function getAndShowWeather ( ) {
     getCurrentWeather(position.coords.longitude, position.coords.latitude);
   });
 
-  setTimeout(getAndShowWeather, 300000);
+  setTimeout(getAndShowWeather, 3600000);
 }
 
 function getCurrentWeather (lon, lat) {

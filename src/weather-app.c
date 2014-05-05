@@ -88,7 +88,7 @@ static void disp_update(void){
        text_layer_set_text(text_temp_layer, str_temp_F);
           }
   
-  app_message_open(64, 16);
+  //app_message_open(64, 16);
   
   
 }
